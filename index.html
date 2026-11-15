@@ -646,6 +646,21 @@ body.lightui .morei{border-color:#e2e5ea;background:#fff}
  .mapfab{bottom:auto}
 }
 @media(max-width:900px){#side.peek{height:128px}#side.peek #v-explore .toggles,#side.peek #v-explore .sec,#side.peek #v-explore .list,#side.peek #v-explore .src{visibility:hidden}}
+/* ===== v1.6 mobile: compact route index card and navigation bar ===== */
+@media(max-width:900px){
+ .idxcard{top:8px;bottom:auto;left:8px;right:64px;transform:none;max-width:none;padding:7px 10px;gap:8px;flex-wrap:nowrap;border-radius:12px}
+ .idxcard small,.idxcard .sd{display:none}
+ .idxcard>div:first-child{min-width:0;flex:1}
+ .idxcard .big{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+ .idxcard .sc{font-size:13px;padding:2px 7px;border-radius:8px;flex:none}
+ .idxcard .side{border-left:0;padding-left:0;font-size:11.5px;white-space:nowrap;flex:none}
+ .navbar{top:8px;left:8px;right:64px;transform:none;max-width:none;padding:7px 7px 7px 10px;gap:6px;flex-wrap:nowrap;border-radius:12px}
+ .navbar .nt{font-size:12px;line-height:1.3;min-width:0;flex:1;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+ .navbar .nt br{display:none}.navbar .nt b+*{}
+ .navbar .ndemo,.navbar .nst,.navbar #nDemo{display:none}
+ .navbar .btn.sm{padding:6px 8px;flex:none;min-width:34px;justify-content:center}
+}
+.navbar .nsep{display:none}@media(max-width:900px){.navbar .nsep{display:inline}}
 </style>
 </head><body>
 <header>
@@ -1678,7 +1693,7 @@ function drawRoute(res,best,fast,a,b){if(!ready)return;clear(objs.route);objs.ro
  try{map.fitBounds({southWest:[Math.min(...lon),Math.min(...lat)],northEast:[Math.max(...lon),Math.max(...lat)]},{padding:window.innerWidth>900?{top:80,bottom:150,left:80,right:90}:{top:60,bottom:Math.round(window.innerHeight*.5),left:40,right:70}})}catch(e){}}
 function showIdx(){if(!lastRoute){$("#idxCard").classList.add("hidden");return}const {best,b}=lastRoute;const d=guessDistrict(b);const ds=S.spots.filter(s=>!isSafe(s)&&live(s)&&s.district===d);
  const v=(best.avg/10).toFixed(1);$("#idxCard").innerHTML=`<div><small>${t("idxTitle")}</small><div class="big">${t("idxRoute")}</div></div><div class="sc" style="color:${scoreColor(best.avg)};border-color:${scoreColor(best.avg)}66;background:${scoreColor(best.avg)}14">${v} / 10</div>
-  <div class="side">${t("idxDist",{d:distName(d)})}<br>${IC.warn} ${ds.filter(s=>s.status!=="fixed").length} · ${IC.check} ${ds.filter(s=>s.status==="fixed").length} · ${IC.store} ${best.sf.length}</div>`;$("#idxCard").classList.remove("hidden")}
+  <div class="side"><span class="sd">${t("idxDist",{d:distName(d)})}<br></span>${IC.warn} ${ds.filter(s=>s.status!=="fixed").length} · ${IC.check} ${ds.filter(s=>s.status==="fixed").length} · ${IC.store} ${best.sf.length}</div>`;$("#idxCard").classList.remove("hidden")}
 function renderRoute(){if(!lastRoute)return;const {res,best,fast,offline}=lastRoute,same=best===fast;
  const avoided=same?0:fast.sp.filter(s=>!best.sp.includes(s)).length;const bd=$("#rBadge");bd.classList.remove("hidden","ok");
  if(offline)bd.textContent=t("rtLine");else if(avoided){bd.textContent=t("rtBadgeAvoid",{s:plural(avoided,"spots")})}else if(!best.sp.length){bd.classList.add("ok");bd.textContent=t("rtAvoidsAll")}else bd.textContent=t("rtFewest",{n:best.sp.length});
@@ -1709,21 +1724,21 @@ $("#rGo").onclick=async()=>{const a=ptOf($("#rFrom").value),b=ptOf($("#rTo").val
  const best=res[0],fast=res.slice().sort((x,y)=>x.len-y.len)[0];lastRoute={res,best,fast,offline,a,b};drawRoute(res,best,fast,a,b);renderRoute()};
 // ---- navigation along the chosen route ----
 let demoT=null;
-function navBar(html,cls){const n=$("#navBar");n.className="navbar"+(cls?" "+cls:"");n.innerHTML=html;n.classList.remove("hidden")}
+function navBar(html,cls){const n=$("#navBar");if(window.innerWidth<=900)$("#idxCard").classList.add("hidden");n.className="navbar"+(cls?" "+cls:"");n.innerHTML=html;n.classList.remove("hidden")}
 function startNav(){if(!lastRoute)return;const {best,b}=lastRoute;nav={l:best.l,b,L:lineLen(best.l),hv:havensFor(best).list.filter(h=>h.off<=150),last:null,done:false};
  if(ready){map.setPitch(view3d?50:0,{duration:500})}startWatch(false);
- if(window.innerWidth<=900)$("#side").classList.add("mini");navUpdate();toast(t("navStarted"),4500)}
+ if(window.innerWidth<=900){$("#side").classList.remove("big","peek");$("#side").classList.add("mini")}navUpdate();toast(t("navStarted"),4500)}
 function stopNav(silent){clearInterval(demoT);demoT=null;nav=null;$("#navBar").classList.add("hidden");if(!silent)toast(t("navStopped"))}
 function navPos(){if(nav&&nav.demo)return nav.demo;return me?[me.lat,me.lon]:null}
 function navUpdate(){if(!nav)return;const p=navPos();
- const btns=`<button class="btn sm" id="nShare">${SHARE}</button>${demoT?"":`<button class="btn sm" id="nDemo">${t("navDemo")}</button>`}<button class="btn sm" id="nStop">✕ ${t("navStop")}</button>`;
+ const btns=`<button class="btn sm" id="nShare">${SHARE}</button>${demoT?"":`<button class="btn sm" id="nDemo">${t("navDemo")}</button>`}<button class="btn sm" id="nStop">✕<span class="nst"> ${t("navStop")}</span></button>`;
  if(!p){navBar(`<div class="nt"><b>Jaryq Jol</b><br>${t("navWaitGps")}</div>${btns}`);bindNav();return}
  const a=along(nav.l,p),left=Math.max(0,nav.L-a.m),toEnd=dist(p,nav.b);
  if(toEnd<40||left<30){nav.done=true;clearInterval(demoT);demoT=null;navBar(`<div class="nt"><b>${t("navArrived")}</b><br>${t("navArrivedSub")}</div><button class="btn sm em" id="nHome">${t("imHome")}</button><button class="btn sm" id="nStop">✕</button>`,"done");
   $("#nHome").onclick=()=>{$("#walkHome").click();stopNav(true)};$("#nStop").onclick=()=>stopNav();return}
  const next=nav.hv.find(h=>h.m>a.m-20);
  const off=a.off>60;
- navBar(`<div class="nt"><b>Jaryq Jol</b> · ${t("navLeft",{d:fmtD(left),m:Math.max(1,Math.round(left/80))})}<br>${off?`<span style="color:#fda4af">${IC.warn} ${t("navOff",{d:fmtD(a.off)})}</span>`:next?`${IC.shield} ${t("navNext",{n:esc(next.p[0]),d:fmtD(Math.max(0,next.m-a.m))})}`:t("navNoNext")}${nav.demo?` · <span style="color:#94a3b8">${t("navDemoNote")}</span>`:""}</div>${btns}`,off?"off":"");
+ navBar(`<div class="nt"><b>Jaryq Jol</b> · ${t("navLeft",{d:fmtD(left),m:Math.max(1,Math.round(left/80))})}<br><span class="nsep"> · </span>${off?`<span style="color:#fda4af">${IC.warn} ${t("navOff",{d:fmtD(a.off)})}</span>`:next?`${IC.shield} ${t("navNext",{n:esc(next.p[0]),d:fmtD(Math.max(0,next.m-a.m))})}`:t("navNoNext")}${nav.demo?`<span class="ndemo"> · <span style="color:#94a3b8">${t("navDemoNote")}</span></span>`:""}</div>${btns}`,off?"off":"");
  bindNav();if(nav.demo&&ready){clear(objs.me);objs.me=[new G.CircleMarker(map,{coordinates:[p[1],p[0]],diameter:16,color:"#2563eb",strokeColor:"#ffffff",strokeWidth:3,interactive:false,zIndex:40})];map.setCenter([p[1],p[0]],{duration:400})}
  else if(ready&&me)map.setCenter([me.lon,me.lat],{duration:500})}
 function bindNav(){const s=$("#nStop");if(s)s.onclick=()=>stopNav();const sh=$("#nShare");if(sh)sh.onclick=()=>shareLocation({mins:nav?Math.max(5,Math.round((nav.L-(navPos()?along(nav.l,navPos()).m:0))/80)+2):15});
