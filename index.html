@@ -543,6 +543,10 @@ nav button{gap:7px}nav button .ic{opacity:.85}nav button.on .ic,nav button:hover
 .acts .btn .ic,.galbar .btn .ic,.nophoto .ic{flex:none}.nophoto{gap:8px}
 @media(min-width:1280px){header .searchbtn{display:none}}
 .scorecard .lgsev{display:flex;gap:9px;flex-wrap:wrap;margin:6px 0 2px}.scorecard .lgsev>span{display:flex;align-items:center;gap:4px}.scorecard .lgsev b{width:11px;height:11px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:2px solid;background:#1e293b;display:inline-block}.scorecard .lgrow i.sq.ol{background:#1e293b;border:2px solid}
+.chip{display:inline-flex;align-items:center;gap:6px}.chip .ic{opacity:.9}
+.item .ico,.card-h .ico{color:#fff}.item .ico .ic{width:18px;height:18px}
+.catgrid label span{display:inline-flex;align-items:center;gap:7px}
+.item .r .ic,.kv .ic{display:inline-block;vertical-align:-2px;margin-right:3px}
 </style>
 </head><body>
 <header>
@@ -574,8 +578,6 @@ nav button{gap:7px}nav button .ic{opacity:.85}nav button.on .ic,nav button:hover
     <div class="toggles">
      <div class="tg on" data-t="score"><span class="sw"></span><span data-i18n="tgScore">Safety zones</span></div>
      <div class="tg on" data-t="247"><span class="sw"></span><span data-i18n="tg247">Open 24/7</span></div>
-     <div class="tg on" data-t="3d"><span class="sw"></span><span data-i18n="tg3d">3D view</span></div>
-     <div class="tg on" data-t="night"><span class="sw"></span><span data-i18n="tgNight">Night map</span></div>
     </div>
     <div class="sec"><b data-i18n="inArea">In this area</b><small id="listInfo"></small></div>
     <div class="list" id="list"></div>
@@ -1095,7 +1097,7 @@ const CATS={
 const catName=k=>t("cat_"+k),catEmo=k=>CATS[k][0],catC1=k=>CATS[k][1],catW=k=>CATS[k][3],catG=k=>CATS[k][4];
 const isSafe=s=>CATS[s.cat]&&catG(s.cat)==="safe";
 const UNSAFE=Object.keys(CATS).filter(k=>catG(k)!=="safe"),SAFEK=Object.keys(CATS).filter(k=>catG(k)==="safe");
-const CHIPS=[["all",""],["light","🌑"],["yard","🏘"],["door","🚪"],["cctv","📷"],["aband","🏚"],["other","⚠️"],["traffic","🚦"],["safe","✅"]];
+const CHIPS=[["all",""],["light","no_lighting"],["yard","dark_courtyard"],["door","broken_intercom"],["cctv","no_cctv"],["aband","abandoned_site"],["other","other"],["traffic","traffic_light"],["safe","guarded"]];
 const SAFE_E={pharmacy:"💊",store:"🏪",cafe:"☕",hospital:"🏥",police:"👮"};
 const DISTRICTS=["Yesil","Nura","Saryarka","Almaty","Baikonyr","Saraishyk"];
 const distName=d=>t("d_"+d);
@@ -1163,6 +1165,8 @@ function pinURL(emoji,c1,c2,o){o=o||{};const k=[emoji,c1,c2,JSON.stringify(o)].j
  return iconCache[k]=cv.toDataURL("image/png")}
 // Compact 2GIS-style drop: 26px circle + 5px tip pointing exactly at the coordinate, 1px outline, soft shadow.
 const PIN_W=32,PIN_H=40,PIN_TIP=[16,37];
+const LIKE_S="<svg class=\"ic\" width=\"13\" height=\"13\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M7.5 10.5v9H4.8a1 1 0 0 1-1-1v-7a1 1 0 0 1 1-1z\"/><path d=\"M7.5 10.5 11 3.8a2 2 0 0 1 2.6 1.4l-.6 3.8h5.3a1.9 1.9 0 0 1 1.9 2.2l-1.2 6.4a1.9 1.9 0 0 1-1.9 1.6H7.5\"/></svg>";
+const catSVG=(k,z)=>{const d=(typeof MK!=="undefined"&&MK[k])||"M12 3.8 2.8 19.5h18.4zM12 10v4.5M12 17.2v.1";return `<svg class="ic" width="${z||16}" height="${z||16}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${d}"/></svg>`};
 const MK={"no_lighting": "M9 21h6M12 21V9M8.5 5.5h7l-1 3.5h-5z M5 3l14 14", "dark_courtyard": "M3.5 20.5h17M5 20.5V10l5-3v13.5M10 20.5V5.5l9 3.5v11.5M13 11h3M13 14.5h3M13 18h3M6.8 13h1.5M6.8 16.5h1.5", "unlit_bus_stop": "M7 21V3.5M7 4h9a1.5 1.5 0 0 1 1.5 1.5v4A1.5 1.5 0 0 1 16 11H7M10.5 7.5h3.5M14 21h5M16.5 15v6", "dark_underpass": "M3.5 20V12a8.5 8.5 0 0 1 17 0v8M7.5 20v-7.5a4.5 4.5 0 0 1 9 0V20M3.5 20h4M16.5 20h4", "unlit_park_path": "M12 21v-6M12 15c-3.6 0-6-2.3-6-5.2 0-2.3 1.6-4 3.4-4.4C10.2 3.6 11 3 12 3s1.8.6 2.6 2.4c1.8.4 3.4 2.1 3.4 4.4 0 2.9-2.4 5.2-6 5.2zM8.5 21h7", "abandoned_site": "M3.5 11 12 4l8.5 7M5.5 9.5V20h13V9.5M9 20v-5h3M14.5 12.5l-2 2.5 2 1.5-1.5 2.5M8 11.5h2", "broken_intercom": "M7 3.5h10a1.5 1.5 0 0 1 1.5 1.5v14a1.5 1.5 0 0 1-1.5 1.5H7A1.5 1.5 0 0 1 5.5 19V5A1.5 1.5 0 0 1 7 3.5zM9 7h6v3.5H9zM9 14h.01M12 14h.01M15 14h.01M9 17h.01M12 17h.01M15 17h.01", "no_cctv": "M3.5 8.5l11-3 1.8 6.2-11 3zM9.2 13.2 8 18.5H4.5M16.3 9.8l3.2-.9 1 3.6-3.2.9M3 3l18 18", "other": "M12 3.8 2.8 19.5h18.4zM12 10v4.5M12 17.2v.1", "traffic_light": "M9 3h6a1.5 1.5 0 0 1 1.5 1.5v13A1.5 1.5 0 0 1 15 19H9a1.5 1.5 0 0 1-1.5-1.5v-13A1.5 1.5 0 0 1 9 3zM12 19v2.5M12 7.2v.1M12 11.2v.1M12 15.2v.1M7.5 7H5M7.5 11H5M16.5 7H19M16.5 11H19", "well_lit": "M9 21h6M12 21V10M8 6.5h8l-1.3 3.5H9.3zM12 3v1.2M5.5 4.8l1 .9M18.5 4.8l-1 .9", "guarded": "M12 3 5 5.8v5.4c0 4.4 2.9 7.8 7 9.6 4.1-1.8 7-5.2 7-9.6V5.8zM9 11.8l2.1 2.1L15 10", "fixed": "M5 12.5l4.3 4.3L19 7.2", "pharmacy": "M10 4h4v6h6v4h-6v6h-4v-6H4v-4h6z", "store": "M5 8h14l-1 12.5H6zM9 8V6.5a3 3 0 0 1 6 0V8", "cafe": "M4.5 9h11v5.5A4.5 4.5 0 0 1 11 19H9a4.5 4.5 0 0 1-4.5-4.5zM15.5 10.5h1.5a2.5 2.5 0 0 1 0 5h-1.5M8 3.5v2.5M11.5 3.5v2.5", "hospital": "M4.5 20.5V6.5a1 1 0 0 1 1-1h13a1 1 0 0 1 1 1v14M3 20.5h18M12 8.5v6M9 11.5h6M10 20.5v-3h4v3"},POL={"badge": "M12 1.6c1.1 1.05 2.7 1.65 4.45 1.65.9 0 1.65-.2 2.25-.55.45.85.45 1.7 0 2.55-.6 1.2-.6 2.4-.1 3.65 1.1 2.75.8 6.05-1.25 8.5-1.4 1.8-3.35 3.05-5.35 4.05-2-1-3.95-2.25-5.35-4.05-2.05-2.45-2.35-5.75-1.25-8.5.5-1.25.5-2.45-.1-3.65-.45-.85-.45-1.7 0-2.55.6.35 1.35.55 2.25.55 1.75 0 3.35-.6 4.45-1.65z", "fill": ["M12 4.1l1.12 2.27 2.5.36-1.81 1.77.43 2.49L12 9.82l-2.24 1.17.43-2.49-1.81-1.77 2.5-.36z", "M6.9 15c0-.45.15-.85.47-1.2 1.05-1.15 2.8-1.85 4.63-1.85s3.58.7 4.63 1.85c.32.35.47.75.47 1.2z", "M7.35 15.85h9.3c-.45 1.35-2.4 2.2-4.65 2.2s-4.2-.85-4.65-2.2z"], "cut": "M12 12.55l.9.36v.8c0 .5-.42.88-.9 1.12-.48-.24-.9-.62-.9-1.12v-.8z"};
 function mkDraw(x,key,cx,cy,size,r,lw){const p=new Path2D(MK[key]);x.save();x.translate(cx-size*r/2,cy-size*r/2);x.scale(size*r/24,size*r/24);x.lineWidth=lw||2;x.lineCap="round";x.lineJoin="round";x.strokeStyle="#fff";x.stroke(p);x.restore()}
 function polDraw(x,cx,cy,size,r,bg){x.save();x.translate(cx-size*r/2,cy-size*r/2);x.scale(size*r/24,size*r/24);x.lineWidth=1.35;x.lineJoin="round";x.strokeStyle="#fff";x.stroke(new Path2D(POL.badge));x.fillStyle="#fff";POL.fill.forEach(d=>x.fill(new Path2D(d)));x.fillStyle=bg;x.fill(new Path2D(POL.cut));x.restore()}
@@ -1325,14 +1329,14 @@ $("#handle").onclick=()=>$("#side").classList.toggle("big");
 function renderStats(){const a=S.spots.filter(live);$("#sVer").textContent=a.filter(s=>!isSafe(s)&&s.status==="verified").length;$("#sUnc").textContent=a.filter(s=>s.status==="unconfirmed").length;$("#sFix").textContent=a.filter(s=>s.status==="fixed").length;
  const n=S.spots.filter(s=>s.status==="pending").length;$("#modDot").textContent=n;$("#modDot").style.display=n?"":"none"}
 function renderChips(){const n=g=>S.spots.filter(s=>live(s)&&(g==="all"?!isSafe(s)&&s.status!=="fixed":catG(s.cat)===g)).length;
- $("#chips").innerHTML=CHIPS.map(c=>`<span class="chip ${group===c[0]?"on":""}" data-g="${c[0]}">${c[1]?c[1]+" ":""}${t("chip_"+c[0])} · ${n(c[0])}</span>`).join("")}
+ $("#chips").innerHTML=CHIPS.map(c=>`<span class="chip ${group===c[0]?"on":""}" data-g="${c[0]}">${c[1]?catSVG(c[1],14):""}${t("chip_"+c[0])} · ${n(c[0])}</span>`).join("")}
 $("#chips").onclick=e=>{const c=e.target.closest(".chip");if(!c)return;group=group===c.dataset.g&&group!=="all"?"all":c.dataset.g;drawSpots();renderChips();updList()};
 $$(".tg").forEach(x=>x.onclick=()=>{const k=x.dataset.t;if(k==="3d")return $("#b3d").click();
  x.classList.toggle("on");const on=x.classList.contains("on");
  if(k==="score"){showScore=on;drawGlow();$("#scorecard").classList.toggle("hidden",!on)}
  if(k==="247"){show247=on;drawSafe();if(showScore)drawGlow()}
  if(k==="night"){setNight(on);syncTheme()}});
-function itemHTML(s){return `<div class="item" data-id="${s.id}"><div class="ico" style="background:${catC1(s.cat)}22;border:1px solid ${catC1(s.cat)}55">${s.status==="fixed"?"✅":catEmo(s.cat)}</div><div style="min-width:0"><div class="t">${esc(titleOf(s))}</div><div class="m">${esc(catName(s.cat))} · ${esc(distName(s.district))}</div></div><div class="r">${s.status==="fixed"?`<span style="color:#34d399">${t("fixedW")}</span>`:`👍 ${s.confirms}`}<br>${s._d!=null&&isFinite(s._d)?fmtD(s._d):""}</div></div>`}
+function itemHTML(s){return `<div class="item" data-id="${s.id}"><div class="ico" style="background:${catC1(s.cat)}22;border:1px solid ${catC1(s.cat)}55">${s.status==="fixed"?catSVG("fixed",24):catSVG(s.cat,24)}</div><div style="min-width:0"><div class="t">${esc(titleOf(s))}</div><div class="m">${esc(catName(s.cat))} · ${esc(distName(s.district))}</div></div><div class="r">${s.status==="fixed"?`<span style="color:#34d399">${t("fixedW")}</span>`:`${LIKE_S} ${s.confirms}`}<br>${s._d!=null&&isFinite(s._d)?fmtD(s._d):""}</div></div>`}
 let lT=null;function updList(){clearTimeout(lT);lT=setTimeout(()=>{if(view!=="explore")return;
  let a=S.spots.filter(s=>live(s)&&(group==="all"||catG(s.cat)===group)),inV=a,cc=AITU;
  if(ready){const c=map.getCenter();cc=[c[1],c[0]];try{const b=map.getBounds();const ne=b.northEast,sw=b.southWest;if(ne&&sw)inV=a.filter(s=>s.lon>=sw[0]&&s.lon<=ne[0]&&s.lat>=sw[1]&&s.lat<=ne[1])}catch(e){}}
@@ -1368,10 +1372,10 @@ function renderGallery(s){const g=$("#gal");if(!g)return;const local=(S.photos[s
 function openSpot(id){const s=S.spots.find(x=>x.id===id);if(!s)return;selId=id;cardOpen=["spot",id];const sc=scoreAt(s.lat,s.lon);
  const b={verified:["b-ver",t("stVerified")],unconfirmed:["b-unc",t("stNeeds")],fixed:["b-fix",t("stFixed")]}[s.status]||["b-unc",s.status];
  $("#v-card").innerHTML=`<button class="back" data-view="explore">← ${t("backList")}</button>
- <div class="card-h"><div class="ico" style="background:${catC1(s.cat)}22;border:1px solid ${catC1(s.cat)}55">${s.status==="fixed"?"✅":catEmo(s.cat)}</div><div><h3>${esc(titleOf(s))}</h3><p>${esc(catName(s.cat))}</p><div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap"><span class="badge ${b[0]}">${b[1]}</span><span class="badge" style="color:${scoreColor(sc.v)};border-color:${scoreColor(sc.v)}66">${t("areaScore",{v:sc.v})}</span></div></div></div>
+ <div class="card-h"><div class="ico" style="background:${catC1(s.cat)}22;border:1px solid ${catC1(s.cat)}55">${s.status==="fixed"?catSVG("fixed",24):catSVG(s.cat,24)}</div><div><h3>${esc(titleOf(s))}</h3><p>${esc(catName(s.cat))}</p><div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap"><span class="badge ${b[0]}">${b[1]}</span><span class="badge" style="color:${scoreColor(sc.v)};border-color:${scoreColor(sc.v)}66">${t("areaScore",{v:sc.v})}</span></div></div></div>
  <div class="quote"><b>“</b> ${esc(descOf(s))}</div>
  <div class="gal" id="gal"></div>
- <div class="kv"><span>${t("kAddress")}</span><b style="font-weight:500">${esc(addrOf(s))}</b><span>${t("kDistrict")}</span><b style="font-weight:500">${esc(distName(s.district))}</b>${s.when?`<span>${t("kUnsafe")}</span><b style="font-weight:500">${esc(whenOf(s.when))}</b>`:""}<span>${t("kConfirmed")}</span><b style="font-weight:500;color:#34d399">👍 ${plural(s.confirms,"people")}</b>${s.status==="fixed"?`<span>${t("kFixedBy")}</span><b style="font-weight:500;color:#6ee7b7">${esc(fixedByOf(s))}</b>`:""}<span>${t("kReported")}</span><b style="font-weight:500">${esc(dateOf(s.date))}</b></div>
+ <div class="kv"><span>${t("kAddress")}</span><b style="font-weight:500">${esc(addrOf(s))}</b><span>${t("kDistrict")}</span><b style="font-weight:500">${esc(distName(s.district))}</b>${s.when?`<span>${t("kUnsafe")}</span><b style="font-weight:500">${esc(whenOf(s.when))}</b>`:""}<span>${t("kConfirmed")}</span><b style="font-weight:500;color:#34d399">${LIKE_S} ${plural(s.confirms,"people")}</b>${s.status==="fixed"?`<span>${t("kFixedBy")}</span><b style="font-weight:500;color:#6ee7b7">${esc(fixedByOf(s))}</b>`:""}<span>${t("kReported")}</span><b style="font-weight:500">${esc(dateOf(s.date))}</b></div>
  <div class="acts">${s.status==="fixed"?"":isSafe(s)?`<button class="btn em" data-a="conf">${LIKE+t("iAgree")}</button>`:`<button class="btn em" data-a="conf">${LIKE+t("iConfirm")}</button><button class="btn" data-a="fixd">${CHECK+t("itsFixed")}</button>`}<button class="btn am" data-a="route" style="${s.status==="fixed"||isSafe(s)?"":"grid-column:1/3"}">${ROUTE+t("routeAvoid")}</button><button class="btn" data-a="share" style="grid-column:1/3">${SHARE+t("sendPlace")}</button></div>
  <div class="src">${s.illustrative?t("srcIllus"):s.source?`${t("srcPublic",{d:esc(dateOf(s.date))})} · ${t("srcApprox")}`:t("srcResident")}</div>`;
  show("card");cardOpen=["spot",id];selId=id;drawSel();renderGallery(s);
@@ -1392,7 +1396,7 @@ function openSafe(i){const p=SAFE[i];selId=null;drawSel();cardOpen=["safe",i];
 // ================= search (2GIS Places API) =================
 let qT=null;const qres=$("#qres");
 function localHits(q){q=q.toLowerCase();const h=[];
- S.spots.filter(live).forEach(s=>{if((titleOf(s)+" "+s.title+" "+addrOf(s)+" "+s.address).toLowerCase().includes(q))h.push({t:titleOf(s),s:catEmo(s.cat)+" "+addrOf(s),id:s.id})});
+ S.spots.filter(live).forEach(s=>{if((titleOf(s)+" "+s.title+" "+addrOf(s)+" "+s.address).toLowerCase().includes(q))h.push({t:titleOf(s),s:addrOf(s),id:s.id})});
  SAFE.forEach((p,i)=>{if((p[0]+" "+p[2]).toLowerCase().includes(q))h.push({t:p[0],s:SAFE_E[p[1]]+" "+p[2]+" · "+p[5],safe:i})});
  S.pins.forEach(p=>{if(p.label.toLowerCase().includes(q))h.push({t:p.label,s:"📌 "+t("yourPin"),ll:[p.lat,p.lon]})});
  LANDMARKS.forEach(l=>{if(l[0].toLowerCase().includes(q))h.push({t:l[0],s:"📍 "+t("landmark"),ll:[l[1],l[2]]})});
@@ -1413,7 +1417,7 @@ document.addEventListener("click",e=>{if(!e.target.closest(".search"))qres.class
 // ================= report =================
 let newLL=null,newHow=null,photo=null;
 function dropDefault(){return `<div style="font-size:24px">📸</div><div style="font-size:13px;font-weight:600">${t("dropT")}</div><small>${t("dropS")}</small>`}
-function fillCats(safe){const cur=$("input[name=cat]:checked");const cv=cur&&cur.value;$("#catgrid").innerHTML=(safe?SAFEK:UNSAFE).map((k,i)=>`<label><input type="radio" name="cat" value="${k}" ${(cv?cv===k:i===0)?"checked":""}><span>${catEmo(k)} ${catName(k)}</span></label>`).join("");if(!$("input[name=cat]:checked"))$("input[name=cat]").checked=true;$("#whenBox").classList.toggle("hidden",safe)}
+function fillCats(safe){const cur=$("input[name=cat]:checked");const cv=cur&&cur.value;$("#catgrid").innerHTML=(safe?SAFEK:UNSAFE).map((k,i)=>`<label><input type="radio" name="cat" value="${k}" ${(cv?cv===k:i===0)?"checked":""}><span>${catSVG(k)} ${catName(k)}</span></label>`).join("");if(!$("input[name=cat]:checked"))$("input[name=cat]").checked=true;$("#whenBox").classList.toggle("hidden",safe)}
 function fillWhen(){const v=$("#when").value;$("#when").innerHTML=["evening","night","always"].map(w=>`<option value="${w}">${t("when_"+w)}</option>`).join("");if(v)$("#when").value=v}
 $$("input[name=kind]").forEach(r=>r.onchange=()=>{$("#catgrid").innerHTML="";fillCats($("input[name=kind]:checked").value==="safe")});
 function guessDistrict(ll){let best="Yesil",bd=1e9;S.spots.forEach(s=>{if(s.illustrative)return;const d=dist(ll,[s.lat,s.lon]);if(d<bd){bd=d;best=s.district}});return ll[0]<51.105&&ll[1]<71.46?"Yesil":best}
@@ -1440,7 +1444,7 @@ $("#send").onclick=()=>{const d=$("#desc").value.trim();if(!newLL){toast(t("need
 function renderMod(){const pend=S.spots.filter(s=>s.status==="pending");
  if(!pend.length){$("#modList").innerHTML=`<div class="note em">${t("mdEmpty")}</div>`;return}
  $("#modList").innerHTML=pend.map(p=>{const fl=p.flags||[],dup=fl.find(f=>f.startsWith("dup")),bad=fl.filter(f=>!f.startsWith("dup"));
-  return `<div class="mcard"><div style="display:flex;justify-content:space-between;align-items:center"><span class="badge" style="color:${catC1(p.cat)};border-color:${catC1(p.cat)}55;background:${catC1(p.cat)}18">${catEmo(p.cat)} ${esc(catName(p.cat))}</span><span style="font-size:11.5px;color:var(--s4)">${p.mins?t("minAgo",{n:p.mins}):t("justNow")}${p.user?" · "+t("byYou"):""}</span></div>
+  return `<div class="mcard"><div style="display:flex;justify-content:space-between;align-items:center"><span class="badge" style="color:${catC1(p.cat)};border-color:${catC1(p.cat)}55;background:${catC1(p.cat)}18">${catSVG(p.cat)} ${esc(catName(p.cat))}</span><span style="font-size:11.5px;color:var(--s4)">${p.mins?t("minAgo",{n:p.mins}):t("justNow")}${p.user?" · "+t("byYou"):""}</span></div>
   <div class="ph">${p.photo?`<img src="${p.photo}">`:`<div style="text-align:center">${CAM} ${t("noPhoto")}<div style="color:#fcd34d;margin-top:3px">${t("mayAsk")}</div></div>`}</div>
   <div style="font-size:12.5px;margin-top:8px"><b style="color:#fcd34d">${t("kLocation")}:</b> ${esc(addrOf(p))} · <a href="#" data-fly="${p.id}">${t("showOnMap")}</a></div>
   <div style="font-size:12.5px;color:var(--s3);margin-top:4px;font-style:italic">«${esc(descOf(p))}»</div>
@@ -1587,10 +1591,10 @@ function renderDash(){
  const all=dData(),act=all.filter(s=>s.status!=="fixed"),fx=all.filter(s=>s.status==="fixed");
  $("#dKpi").innerHTML=[[act.filter(s=>s.status==="verified").length,"kpVer"],[fx.length,"kpFix"],[(all.length?Math.round(fx.length/all.length*100):0)+"%","kpRate"],[all.reduce((a,s)=>a+s.confirms,0),"kpConf"],[act.filter(s=>catG(s.cat)==="light"||catG(s.cat)==="yard").length,"kpLight"],[S.spots.filter(s=>s.status==="pending").length,"kpPend"]].map(k=>`<div class="kpi"><b>${k[0]}</b><span>${t(k[1])}</span></div>`).join("");
  const cc={};act.forEach(s=>cc[s.cat]=(cc[s.cat]||0)+1);const mx=Math.max(1,...Object.values(cc));
- $("#dCats").innerHTML=Object.entries(cc).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<div style="margin:8px 0;font-size:12.5px"><div style="display:flex;justify-content:space-between"><span>${catEmo(k)} ${catName(k)}</span><b>${v}</b></div><div class="bar2" style="width:${v/mx*100}%;background:${catC1(k)}"></div></div>`).join("");
+ $("#dCats").innerHTML=Object.entries(cc).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<div style="margin:8px 0;font-size:12.5px"><div style="display:flex;justify-content:space-between"><span>${catSVG(k)} ${catName(k)}</span><b>${v}</b></div><div class="bar2" style="width:${v/mx*100}%;background:${catC1(k)}"></div></div>`).join("");
  const dd={};S.spots.filter(s=>!isSafe(s)&&(s.status==="verified"||s.status==="unconfirmed")).forEach(s=>dd[s.district]=(dd[s.district]||0)+1);const md=Math.max(1,...Object.values(dd));
  $("#dDistBars").innerHTML=DISTRICTS.map(k=>`<div style="margin:8px 0;font-size:12.5px"><div style="display:flex;justify-content:space-between"><span>${distName(k)}</span><b>${dd[k]||0}</b></div><div class="bar2" style="width:${(dd[k]||0)/md*100}%"></div></div>`).join("");
- $("#dTable").innerHTML=`<tr><th>#</th><th>${t("thSpot")}</th><th>${t("thCond")}</th><th>${t("kDistrict")}</th><th>${t("thConf")}</th><th>${t("thPrio")}</th><th></th></tr>`+act.slice().sort((a,b)=>prio(b)-prio(a)).slice(0,20).map((s,i)=>`<tr><td>${i+1}</td><td><b>${esc(titleOf(s))}</b><div style="font-size:11.5px;color:var(--s4)">${esc(addrOf(s))}</div></td><td>${catEmo(s.cat)} ${catName(s.cat)}</td><td>${distName(s.district)}</td><td>${s.confirms}</td><td>${prio(s)}</td><td><button class="btn sm em" data-fix="${s.id}">${t("markFixed")}</button></td></tr>`).join("");
+ $("#dTable").innerHTML=`<tr><th>#</th><th>${t("thSpot")}</th><th>${t("thCond")}</th><th>${t("kDistrict")}</th><th>${t("thConf")}</th><th>${t("thPrio")}</th><th></th></tr>`+act.slice().sort((a,b)=>prio(b)-prio(a)).slice(0,20).map((s,i)=>`<tr><td>${i+1}</td><td><b>${esc(titleOf(s))}</b><div style="font-size:11.5px;color:var(--s4)">${esc(addrOf(s))}</div></td><td>${catSVG(s.cat)} ${catName(s.cat)}</td><td>${distName(s.district)}</td><td>${s.confirms}</td><td>${prio(s)}</td><td><button class="btn sm em" data-fix="${s.id}">${t("markFixed")}</button></td></tr>`).join("");
  if($("#dDist").value&&all.length&&dmap){const lat=all.map(s=>s.lat),lon=all.map(s=>s.lon);try{dmap.fitBounds({southWest:[Math.min(...lon),Math.min(...lat)],northEast:[Math.max(...lon),Math.max(...lat)]},{padding:{top:60,bottom:60,left:60,right:60}})}catch(e){}}}
 $("#dDist").onchange=renderDash;
 $("#dTable").onclick=e=>{const b=e.target.closest("[data-fix]");if(!b)return;const s=S.spots.find(x=>x.id===b.dataset.fix);s.status="fixed";s.fixedBy="d:"+s.district;save();refresh();renderDash();toast(t("fixedNotice",{n:s.confirms,by:fixedByOf(s)}),5000)};
